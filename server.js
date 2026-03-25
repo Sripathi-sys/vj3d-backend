@@ -12,19 +12,29 @@ dotenv.config();
 
 const app = express();
 
+
 // ── MIDDLEWARE ──
 app.use(cors({
-  origin: "*", // allow all (for testing)
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
+app.use((req, res, next) => {
+  res.removeHeader("Content-Security-Policy"); // ✅ add here
+  next();
+});
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+
+app.use((req, res, next) => {
+  res.removeHeader("Content-Security-Policy"); // ✅ remove CSP
+  next();
+});
 // ── ROUTES ──
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/categories', require('./routes/categoryRoutes'));
