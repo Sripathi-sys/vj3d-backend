@@ -1,9 +1,10 @@
 // ============================================================
 // server.js — Main Express Server for VJ 3D Works
 // ============================================================
+
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
+const cors = require('cors'); // ✅ only once
 const dotenv = require('dotenv');
 const path = require('path');
 
@@ -13,11 +14,11 @@ const app = express();
 
 // ── MIDDLEWARE ──
 app.use(cors({
-  origin: function(origin, callback) {
-    callback(null, true);
-  },
+  origin: "*", // allow all (for testing)
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -25,11 +26,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ── ROUTES ──
-app.use('/api/products',  require('./routes/productRoutes'));
-app.use('/api/categories',require('./routes/categoryRoutes'));
-app.use('/api/orders',    require('./routes/orderRoutes'));
-app.use('/api/auth',      require('./routes/authRoutes'));
-app.use('/api/contact',   require('./routes/contactRoutes'));
+app.use('/api/products', require('./routes/productRoutes'));
+app.use('/api/categories', require('./routes/categoryRoutes'));
+app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/contact', require('./routes/contactRoutes'));
 
 // ── HEALTH CHECK ──
 app.get('/api/health', (req, res) => {
