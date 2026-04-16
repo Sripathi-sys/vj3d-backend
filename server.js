@@ -15,8 +15,7 @@ const app = express();
 
 // ── MIDDLEWARE ──
 app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: true,
   credentials: true
 }));
 
