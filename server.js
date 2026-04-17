@@ -8,9 +8,21 @@ dotenv.config();
 
 const app = express();
 
-// ✅ CORS (FIXED - no app.options)
+// ✅ CORS (Wildcard support for *.vj3dworks.com)
 app.use(cors({
-  origin: "https://vj3dworks.com", // your frontend domain
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman, mobile apps)
+    if (!origin) return callback(null, true);
+
+    if (
+      origin === "https://vj3dworks.com" ||
+      origin.endsWith(".vj3dworks.com")
+    ) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("❌ Not allowed by CORS: " + origin));
+  },
   credentials: true
 }));
 
@@ -30,7 +42,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'VJ 3D Works API running' });
 });
 
-// ✅ Root route (optional but useful)
+// ✅ Root route
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
