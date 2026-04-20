@@ -8,7 +8,7 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Allowed Origins
+// ✅ Allowed origins
 const allowedOrigins = [
   "https://vj3dworks.com",
   "https://www.vj3dworks.com",
@@ -17,7 +17,7 @@ const allowedOrigins = [
   "http://localhost:5173"
 ];
 
-// ✅ CORS (FINAL FIXED)
+// ✅ CORS
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
@@ -27,12 +27,24 @@ app.use(cors({
     }
 
     console.log("❌ Blocked by CORS:", origin);
-    return callback(null, false); // ✅ DO NOT throw error
+    return callback(null, false);
   },
   credentials: true
 }));
 
-// ❌ IMPORTANT: DO NOT ADD app.options('*', cors());
+// ✅ PRE-FLIGHT HANDLER (VERY IMPORTANT)
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 // ✅ Middleware
 app.use(express.json());
@@ -45,23 +57,23 @@ app.use('/api/orders',     require('./routes/orderRoutes'));
 app.use('/api/auth',       require('./routes/authRoutes'));
 app.use('/api/contact',    require('./routes/contactRoutes'));
 
-// ✅ Health Check
+// ✅ Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'VJ 3D Works API running' });
 });
 
-// ✅ Root
+// ✅ Root route
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// ✅ Global Error Handler
+// ✅ Global error handler
 app.use((err, req, res, next) => {
   console.error("🔥 Server Error:", err.message);
   res.status(500).json({ message: err.message });
 });
 
-// ✅ MongoDB + Server Start
+// ✅ Connect DB & start server
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected');
