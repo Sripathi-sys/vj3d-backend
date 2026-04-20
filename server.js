@@ -8,35 +8,35 @@ dotenv.config();
 
 const app = express();
 
-// ✅ CORS
+// ✅ CORS (SAFE & SIMPLE)
+const allowedOrigins = [
+  "https://vj3dworks.com",
+  "https://www.vj3dworks.com",
+  "https://admin.vj3dworks.com",
+  process.env.FRONTEND_URL,
+  "http://localhost:3000",
+  "http://localhost:5173"
+];
+
 app.use(cors({
   origin: function (origin, callback) {
+    // Allow requests with no origin (Postman, mobile apps)
     if (!origin) return callback(null, true);
 
-    const allowedOrigins = [
-      "https://vj3dworks.com",
-      "https://admin.vj3dworks.com",
-      process.env.FRONTEND_URL,
-      "http://localhost:3000",
-      "http://localhost:5173",
-    ];
-
-    if (
-      allowedOrigins.includes(origin) ||
-      origin.endsWith(".vj3dworks.com")
-    ) {
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
-    return callback(new Error("❌ Not allowed by CORS: " + origin));
+    console.log("❌ Blocked by CORS:", origin);
+    return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// ✅ Handle Preflight (fixed for newer Express)
-app.options(/.*/, cors());
+// ❌ REMOVE THIS (causes issues)
+// app.options(/.*/, cors());
 
 // ✅ Middleware
 app.use(express.json());
@@ -59,14 +59,25 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
+// ✅ GLOBAL ERROR HANDLER (VERY IMPORTANT)
+app.use((err, req, res, next) => {
+  console.error("🔥 Server Error:", err.message);
+  res.status(500).json({
+    success: false,
+    message: err.message
+  });
+});
+
 // ✅ MongoDB + Server Start
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected');
+
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
+
   })
   .catch(err => {
     console.error('❌ MongoDB connection failed:', err.message);
