@@ -16,9 +16,9 @@ app.use(cors({
     const allowedOrigins = [
       "https://vj3dworks.com",
       "https://admin.vj3dworks.com",
+      process.env.FRONTEND_URL,
       "http://localhost:3000",
       "http://localhost:5173",
-      "http://localhost:4173",
     ];
 
     if (
@@ -35,8 +35,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// ✅ Handle Preflight Requests
-app.options('*', cors());
+// ✅ Handle Preflight (fixed for newer Express)
+app.options(/.*/, cors());
 
 // ✅ Middleware
 app.use(express.json());
