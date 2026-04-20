@@ -8,19 +8,19 @@ dotenv.config();
 
 const app = express();
 
-// ✅ CORS (SAFE & SIMPLE)
+// ✅ Allowed Origins
 const allowedOrigins = [
   "https://vj3dworks.com",
   "https://www.vj3dworks.com",
   "https://admin.vj3dworks.com",
-  process.env.FRONTEND_URL,
   "http://localhost:3000",
   "http://localhost:5173"
 ];
 
+// ✅ CORS (FINAL FIXED VERSION)
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (Postman, mobile apps)
+    // allow requests with no origin (Postman, mobile, some preflight cases)
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
@@ -28,15 +28,17 @@ app.use(cors({
     }
 
     console.log("❌ Blocked by CORS:", origin);
-    return callback(new Error("Not allowed by CORS"));
+
+    // ⚠️ IMPORTANT: don't throw error (prevents "status null")
+    return callback(null, false);
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// ❌ REMOVE THIS (causes issues)
-// app.options(/.*/, cors());
+// ✅ Handle preflight explicitly (VERY IMPORTANT)
+app.options('*', cors());
 
 // ✅ Middleware
 app.use(express.json());
@@ -59,7 +61,7 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// ✅ GLOBAL ERROR HANDLER (VERY IMPORTANT)
+// ✅ GLOBAL ERROR HANDLER (prevents silent crashes)
 app.use((err, req, res, next) => {
   console.error("🔥 Server Error:", err.message);
   res.status(500).json({
