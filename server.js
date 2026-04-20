@@ -17,10 +17,9 @@ const allowedOrigins = [
   "http://localhost:5173"
 ];
 
-// ✅ CORS (FINAL FIXED VERSION)
+// ✅ CORS (FINAL FIXED)
 app.use(cors({
   origin: function (origin, callback) {
-    // allow requests with no origin (Postman, mobile, some preflight cases)
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
@@ -28,17 +27,12 @@ app.use(cors({
     }
 
     console.log("❌ Blocked by CORS:", origin);
-
-    // ⚠️ IMPORTANT: don't throw error (prevents "status null")
-    return callback(null, false);
+    return callback(null, false); // ✅ DO NOT throw error
   },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  credentials: true
 }));
 
-// ✅ Handle preflight explicitly (VERY IMPORTANT)
-app.options('*', cors());
+// ❌ IMPORTANT: DO NOT ADD app.options('*', cors());
 
 // ✅ Middleware
 app.use(express.json());
@@ -56,18 +50,15 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'VJ 3D Works API running' });
 });
 
-// ✅ Root Route
+// ✅ Root
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// ✅ GLOBAL ERROR HANDLER (prevents silent crashes)
+// ✅ Global Error Handler
 app.use((err, req, res, next) => {
   console.error("🔥 Server Error:", err.message);
-  res.status(500).json({
-    success: false,
-    message: err.message
-  });
+  res.status(500).json({ message: err.message });
 });
 
 // ✅ MongoDB + Server Start
@@ -79,7 +70,6 @@ mongoose.connect(process.env.MONGO_URI)
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
-
   })
   .catch(err => {
     console.error('❌ MongoDB connection failed:', err.message);
