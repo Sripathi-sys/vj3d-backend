@@ -2,11 +2,11 @@
 const mongoose = require('mongoose');
 
 const orderItemSchema = new mongoose.Schema({
-  product:  { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-  name:     String,
-  price:    Number,
-  qty:      Number,
-  emoji:    String,
+  product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+  name:    String,
+  price:   Number,
+  qty:     Number,
+  emoji:   String,
 });
 
 const orderSchema = new mongoose.Schema({
@@ -18,13 +18,28 @@ const orderSchema = new mongoose.Schema({
   pincode:       { type: String, required: true },
   items:         [orderItemSchema],
   totalAmount:   { type: Number, required: true },
-  status: {
-    type: String,
-    enum: ['pending','confirmed','processing','shipped','delivered','cancelled'],
-    default: 'pending'
-  },
-  paymentMethod: { type: String, default: 'COD' },
   notes:         { type: String, default: '' },
+
+  status: {
+    type:    String,
+    enum:    ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
+    default: 'pending',
+  },
+
+  // ✅ Payment fields
+  paymentMethod: {
+    type:    String,
+    enum:    ['COD', 'Razorpay'],
+    default: 'COD',
+  },
+  paymentStatus: {
+    type:    String,
+    enum:    ['Pending', 'Paid', 'Failed'],
+    default: 'Pending',
+  },
+  razorpayOrderId:   { type: String, default: '' },
+  razorpayPaymentId: { type: String, default: '' },
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);
