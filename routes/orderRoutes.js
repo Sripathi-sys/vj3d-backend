@@ -13,14 +13,13 @@ const razorpay = new Razorpay({
 
 // ─────────────────────────────────────────────
 // POST /api/orders/create-razorpay-order
-// Called BEFORE showing the payment popup
 // ─────────────────────────────────────────────
 router.post('/create-razorpay-order', async (req, res) => {
   try {
     const { amount } = req.body;
 
     const options = {
-      amount:   Math.round(amount * 100), // ₹ to paise
+      amount:   Math.round(amount * 100),
       currency: 'INR',
       receipt:  `receipt_${Date.now()}`,
     };
@@ -35,7 +34,6 @@ router.post('/create-razorpay-order', async (req, res) => {
 
 // ─────────────────────────────────────────────
 // POST /api/orders/verify-payment
-// Called AFTER user pays — verifies & saves order
 // ─────────────────────────────────────────────
 router.post('/verify-payment', async (req, res) => {
   try {
@@ -46,7 +44,6 @@ router.post('/verify-payment', async (req, res) => {
       orderData,
     } = req.body;
 
-    // ✅ Verify Razorpay signature
     const body     = razorpay_order_id + '|' + razorpay_payment_id;
     const expected = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
@@ -57,7 +54,6 @@ router.post('/verify-payment', async (req, res) => {
       return res.status(400).json({ success: false, message: '⚠️ Payment verification failed' });
     }
 
-    // ✅ Save order to MongoDB
     const newOrder = await Order.create({
       ...orderData,
       paymentMethod:     'Razorpay',
@@ -74,7 +70,7 @@ router.post('/verify-payment', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// POST /api/orders — COD fallback (kept for reference)
+// POST /api/orders — COD fallback
 // ─────────────────────────────────────────────
 router.post('/', async (req, res) => {
   try {
@@ -123,6 +119,19 @@ router.put('/:id/status', protect, async (req, res) => {
     res.json(order);
   } catch (err) {
     res.status(400).json({ message: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────
+// DELETE /api/orders/:id — delete order (admin only)
+// ─────────────────────────────────────────────
+router.delete('/:id', protect, async (req, res) => {
+  try {
+    const order = await Order.findByIdAndDelete(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    res.json({ message: 'Order deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
