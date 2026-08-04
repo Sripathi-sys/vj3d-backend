@@ -32,6 +32,20 @@ const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 // but secure_url is more reliable — we try it first
 const getImageUrl = (file) => file.secure_url || file.path;
 
+// POST /api/products/upload — upload a single image to Cloudinary (public)
+router.post('/upload', upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+    const url = getImageUrl(req.file);
+    res.json({ url });
+  } catch (err) {
+    console.error('❌ Upload error:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // GET /api/products — all products (public)
 router.get('/', async (req, res) => {
   try {
