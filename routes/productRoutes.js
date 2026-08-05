@@ -94,6 +94,14 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
     if (body.isNewArrival !== undefined) body.isNewArrival = body.isNewArrival === 'true' || body.isNewArrival === true;
     if (body.isCombo      !== undefined) body.isCombo      = body.isCombo      === 'true' || body.isCombo      === true;
 
+    // Parse sizes and colors
+    if (body.sizes) {
+      try { body.sizes = JSON.parse(body.sizes); } catch (e) {}
+    }
+    if (body.colors) {
+      try { body.colors = JSON.parse(body.colors); } catch (e) {}
+    }
+
     // Remove empty category
     if (!body.category || body.category === '') delete body.category;
 
@@ -108,6 +116,23 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
 router.put('/:id', protect, upload.array('images', 5), async (req, res) => {
   try {
     const updates = { ...req.body };
+
+    // Convert string booleans
+    if (updates.inStock      !== undefined) updates.inStock      = updates.inStock      === 'true' || updates.inStock      === true;
+    if (updates.featured     !== undefined) updates.featured     = updates.featured     === 'true' || updates.featured     === true;
+    if (updates.isNewArrival !== undefined) updates.isNewArrival = updates.isNewArrival === 'true' || updates.isNewArrival === true;
+    if (updates.isCombo      !== undefined) updates.isCombo      = updates.isCombo      === 'true' || updates.isCombo      === true;
+
+    // Parse sizes and colors
+    if (updates.sizes) {
+      try { updates.sizes = JSON.parse(updates.sizes); } catch (e) {}
+    }
+    if (updates.colors) {
+      try { updates.colors = JSON.parse(updates.colors); } catch (e) {}
+    }
+
+    // Remove empty category
+    if (!updates.category || updates.category === '') delete updates.category;
 
     // ✅ FIX: Use secure_url here too
     if (req.files?.length) {

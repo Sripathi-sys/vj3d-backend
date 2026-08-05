@@ -14,7 +14,13 @@ const productSchema = new mongoose.Schema({
   featured:      { type: Boolean, default: false },
   isNewArrival:  { type: Boolean, default: false },
   isCombo:       { type: Boolean, default: false },
+  sizes: [{
+    size: { type: String, required: true },
+    price: { type: Number, required: true }
+  }],
+  colors: [{ type: String }],
   tags:          [String],
 }, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);
+
