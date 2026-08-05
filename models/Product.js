@@ -14,6 +14,7 @@ const productSchema = new mongoose.Schema({
   featured:      { type: Boolean, default: false },
   isNewArrival:  { type: Boolean, default: false },
   isCombo:       { type: Boolean, default: false },
+  allowCustomPhoto: { type: Boolean, default: false },
   sizes: [{
     size: { type: String, required: true },
     price: { type: Number, required: true }

@@ -89,10 +89,11 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
     const body = { ...req.body };
 
     // Convert string booleans
-    if (body.inStock      !== undefined) body.inStock      = body.inStock      === 'true' || body.inStock      === true;
-    if (body.featured     !== undefined) body.featured     = body.featured     === 'true' || body.featured     === true;
-    if (body.isNewArrival !== undefined) body.isNewArrival = body.isNewArrival === 'true' || body.isNewArrival === true;
-    if (body.isCombo      !== undefined) body.isCombo      = body.isCombo      === 'true' || body.isCombo      === true;
+    if (body.inStock          !== undefined) body.inStock          = body.inStock          === 'true' || body.inStock          === true;
+    if (body.featured         !== undefined) body.featured         = body.featured         === 'true' || body.featured         === true;
+    if (body.isNewArrival     !== undefined) body.isNewArrival     = body.isNewArrival     === 'true' || body.isNewArrival     === true;
+    if (body.isCombo          !== undefined) body.isCombo          = body.isCombo          === 'true' || body.isCombo          === true;
+    if (body.allowCustomPhoto !== undefined) body.allowCustomPhoto = body.allowCustomPhoto === 'true' || body.allowCustomPhoto === true;
 
     // Parse sizes and colors
     if (body.sizes) {
@@ -118,10 +119,11 @@ router.put('/:id', protect, upload.array('images', 5), async (req, res) => {
     const updates = { ...req.body };
 
     // Convert string booleans
-    if (updates.inStock      !== undefined) updates.inStock      = updates.inStock      === 'true' || updates.inStock      === true;
-    if (updates.featured     !== undefined) updates.featured     = updates.featured     === 'true' || updates.featured     === true;
-    if (updates.isNewArrival !== undefined) updates.isNewArrival = updates.isNewArrival === 'true' || updates.isNewArrival === true;
-    if (updates.isCombo      !== undefined) updates.isCombo      = updates.isCombo      === 'true' || updates.isCombo      === true;
+    if (updates.inStock          !== undefined) updates.inStock          = updates.inStock          === 'true' || updates.inStock          === true;
+    if (updates.featured         !== undefined) updates.featured         = updates.featured         === 'true' || updates.featured         === true;
+    if (updates.isNewArrival     !== undefined) updates.isNewArrival     = updates.isNewArrival     === 'true' || updates.isNewArrival     === true;
+    if (updates.isCombo          !== undefined) updates.isCombo          = updates.isCombo          === 'true' || updates.isCombo          === true;
+    if (updates.allowCustomPhoto !== undefined) updates.allowCustomPhoto = updates.allowCustomPhoto === 'true' || updates.allowCustomPhoto === true;
 
     // Parse sizes and colors
     if (updates.sizes) {
